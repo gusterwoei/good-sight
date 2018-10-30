@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>20x20x20 Assistant</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<style>
+    button {
+        width: 300px;
+    }
+
+    @media screen and (max-width: 600px) {
+        .btn.btn-success {
+            margin-bottom: 5px;
+        }
+    }
+
+    #status {
+        margin-top: 100px;
+        font-size: 30px;
+        color: steelblue;
+    }
+</style>
+
+<body>
+    <div class='col'>
+        <h2 class="text-center m-3">Guster's 20-20-20 Assistant</h2>
+        <div class="text-center">
+            <button id="btnStart" class="btn btn-success" onclick="start()">Start</button>
+            <button id="btnStop" class="btn btn-danger" onclick="stop()" disabled>Stop</button>
+        </div>
+        <div id="status" class="text-center"></div>
+        <div id="countdown" class="text-center"></div>
+    </div>
+
+    <script>
+        // You can also require other files to run in this process
+        require('./renderer.js')
+
+        const MINS = 20 // 20 minutes
+        const SECS = 59
+
+        let mTimer;
+        let mCdTimer;
+        let mStart = true
+        let mCdMin = MINS
+        let mCdSec = 0
+
+        function start() {
+            mStart = true
+
+            setStatus('Started')
+            toggleButtonStatus(true)
+            startTimer()
+        }
+
+        function startTimer() {
+            mTimer = setTimeout(() => {
+                if (!mStart) return
+
+                // show notification
+                new Notification('Time out, now look away!', {
+                    requireInteraction: true
+                })
+
+                startTimer()
+            }, MINS * 60 * 1000);
+
+            // the countdown timer
+            if (!mCdTimer) {
+                startCdTimer()
+            }
+        }
+
+        function startCdTimer() {
+            mCdTimer = setTimeout(() => {
+                if (!mStart) return
+
+                let countdown = document.getElementById('countdown')
+
+                if (mCdMin == 0 && mCdSec == 0) {
+                    mCdMin = MINS - 1
+                    mCdSec = SECS
+                } else if (mCdSec == 0) {
+                    mCdSec = SECS
+                    mCdMin -= 1
+                } else {
+                    mCdSec -= 1
+                }
+
+                updateCdTimer()
+                startCdTimer()
+            }, 1000);
+        }
+
+        function stop() {
+            // reset flags
+            mStart = false
+            mCdMin = MINS
+            mCdSec = 0
+            
+            // clear timer
+            clearTimeout(mTimer)
+            
+            // clear countdown timer
+            clearTimeout(mCdTimer)
+            mCdTimer = null
+
+            // update countdown
+            let countdown = document.getElementById('countdown')
+            updateCdTimer()
+
+            toggleButtonStatus(false)
+            setStatus('Stopped')
+        }
+
+        function setStatus(msg) {
+            let status = document.getElementById('status')
+            status.innerText = msg
+        }
+
+        function updateCdTimer() {
+            countdown.innerText = `Ready in: ${mCdMin}:${("0" + mCdSec).slice(-2)}`
+        }
+
+        function toggleButtonStatus(started) {
+            let btnStart = document.getElementById('btnStart')
+            let btnStop = document.getElementById('btnStop')
+            if (started) {
+                btnStart.disabled = true
+                btnStop.disabled = false
+            } else {
+                btnStart.disabled = false
+                btnStop.disabled = true
+            }
+        }
+
+    </script>
+</body>
+
+</html>
