@@ -11,6 +11,10 @@
 </head>
 
 <style>
+    body {
+        background-color: whitesmoke;
+    }
+
     button {
         width: 300px;
     }
@@ -22,9 +26,9 @@
     }
 
     #status {
-        margin-top: 100px;
         font-size: 30px;
         color: steelblue;
+        margin-top: 100px;
     }
 </style>
 
@@ -35,8 +39,10 @@
             <button id="btnStart" class="btn btn-success" onclick="start()">Start</button>
             <button id="btnStop" class="btn btn-danger" onclick="stop()" disabled>Stop</button>
         </div>
-        <div id="status" class="text-center"></div>
-        <div id="countdown" class="text-center"></div>
+        <div class="status-container">
+            <div id="status" class="text-center"></div>
+            <div id="countdown" class="text-center"></div>
+        </div>
     </div>
 
     <script>
@@ -61,16 +67,14 @@
         }
 
         function startTimer() {
-            mTimer = setTimeout(() => {
+            mTimer = setInterval(() => {
                 if (!mStart) return
 
                 // show notification
                 new Notification('Time out, now look away!', {
                     requireInteraction: true
                 })
-
-                startTimer()
-            }, MINS * 60 * 1000);
+            }, MINS * 60 * 1000)
 
             // the countdown timer
             if (!mCdTimer) {
@@ -79,7 +83,7 @@
         }
 
         function startCdTimer() {
-            mCdTimer = setTimeout(() => {
+            mCdTimer = setInterval(() => {
                 if (!mStart) return
 
                 let countdown = document.getElementById('countdown')
@@ -95,7 +99,6 @@
                 }
 
                 updateCdTimer()
-                startCdTimer()
             }, 1000);
         }
 
@@ -104,10 +107,10 @@
             mStart = false
             mCdMin = MINS
             mCdSec = 0
-            
+
             // clear timer
             clearTimeout(mTimer)
-            
+
             // clear countdown timer
             clearTimeout(mCdTimer)
             mCdTimer = null
