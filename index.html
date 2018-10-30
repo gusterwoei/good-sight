@@ -14,27 +14,38 @@
     body {
         background-color: whitesmoke;
     }
-
     button {
         width: 300px;
     }
-
     @media screen and (max-width: 600px) {
         .btn.btn-success {
             margin-bottom: 5px;
         }
     }
-
     #status {
         font-size: 30px;
-        color: steelblue;
+        color: grey;
         margin-top: 100px;
+    }
+    .app-title {
+        color:steelblue;
+    }
+    .footer {
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        font-size: 13px;
     }
 </style>
 
 <body>
     <div class='col'>
-        <h2 class="text-center m-3">Guster's 20-20-20 Assistant</h2>
+        <div class="text-center m-3">
+            <img src='./app-icon.png' width="70" height="70" alt='' />
+            <h2 class='app-title'>Good Sight</h2>
+            <h6>20-20-20 Rule Reminder</h6>
+        </div>
+
         <div class="text-center">
             <button id="btnStart" class="btn btn-success" onclick="start()">Start</button>
             <button id="btnStop" class="btn btn-danger" onclick="stop()" disabled>Stop</button>
@@ -43,7 +54,10 @@
             <div id="status" class="text-center"></div>
             <div id="countdown" class="text-center"></div>
         </div>
+
     </div>
+
+    <span class='m-3 footer'><i>Created by</i> Guster</span>
 
     <script>
         // You can also require other files to run in this process
