@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>20x20x20 Assistant</title>
+    <title>20-20-20 Assistant</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
@@ -14,22 +14,27 @@
     body {
         background-color: whitesmoke;
     }
+
     button {
         width: 300px;
     }
+
     @media screen and (max-width: 600px) {
         .btn.btn-success {
             margin-bottom: 5px;
         }
     }
+
     #status {
         font-size: 30px;
         color: grey;
         margin-top: 100px;
     }
+
     .app-title {
-        color:steelblue;
+        color: steelblue;
     }
+
     .footer {
         bottom: 0;
         right: 0;
@@ -71,6 +76,7 @@
         let mStart = true
         let mCdMin = MINS
         let mCdSec = 0
+        let mStartTime
 
         function start() {
             mStart = true
@@ -81,8 +87,12 @@
         }
 
         function startTimer() {
+            mStartTime = new Date().getTime()
+        
             mTimer = setInterval(() => {
                 if (!mStart) return
+
+                mStartTime = new Date().getTime()
 
                 // show notification
                 new Notification('Time out, now look away!', {
@@ -97,19 +107,20 @@
         }
 
         function startCdTimer() {
+            let countdown = document.getElementById('countdown')
             mCdTimer = setInterval(() => {
                 if (!mStart) return
 
-                let countdown = document.getElementById('countdown')
+                let now = new Date().getTime()
+                let nowMin = Math.max(Math.floor(((now - mStartTime) / 1000) / 60), 1)
+                let nowSecond = Math.floor(((now - mStartTime) / 1000) % 60)
 
-                if (mCdMin == 0 && mCdSec == 0) {
-                    mCdMin = MINS - 1
-                    mCdSec = SECS
-                } else if (mCdSec == 0) {
-                    mCdSec = SECS
-                    mCdMin -= 1
-                } else {
-                    mCdSec -= 1
+                // calculate seconds delta first
+                mCdSec = 60 - nowSecond
+                mCdMin = MINS - nowMin
+
+                if (mCdSec == 60) {
+                    mCdSec = 0;
                 }
 
                 updateCdTimer()
