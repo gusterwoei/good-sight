@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
@@ -28,7 +29,6 @@
     #status {
         font-size: 30px;
         color: grey;
-        margin-top: 100px;
     }
 
     .app-title {
@@ -40,6 +40,20 @@
         right: 0;
         position: absolute;
         font-size: 13px;
+    }
+    .notification {
+        width: 300px;
+        margin: auto;
+    }
+    .status-container {
+        margin-top: 50px;
+    }
+    .notification-time {
+        color: royalblue;
+    }
+    .notification-close {
+        color: orangered;
+        cursor: pointer;
     }
 </style>
 
@@ -56,7 +70,13 @@
             <button id="btnStop" class="btn btn-danger" onclick="stop()" disabled>Stop</button>
         </div>
         <div class="status-container">
-            <div id="status" class="text-center"></div>
+            <!-- last activity notification -->
+            <div id="notification" class='border p-2 notification'>
+                <div class="float-right" onclick="showNotification(false)"><i class="far fa-times-circle notification-close"></i></div>
+                <div class="text-center">Previous exercise at : <span id="notification-time" class='notification-time'>00:00</span> </div>
+            </div>
+
+            <div id="status" class="text-center mt-3"></div>
             <div id="countdown" class="text-center"></div>
         </div>
 
@@ -68,7 +88,7 @@
         // You can also require other files to run in this process
         require('./renderer.js')
 
-        const MINS = 20 // 20 minutes
+        const MINS = 1 // 20 minutes
         const SECS = 59
 
         let mTimer;
@@ -77,6 +97,9 @@
         let mCdMin = MINS
         let mCdSec = 0
         let mStartTime
+
+        // hide notification stastus by default
+        showNotification(false)
 
         function start() {
             mStart = true
@@ -88,16 +111,18 @@
 
         function startTimer() {
             mStartTime = new Date().getTime()
-        
+
             mTimer = setInterval(() => {
                 if (!mStart) return
-
+                
                 mStartTime = new Date().getTime()
 
+                // show the previous activity notification status
+                setLastActivityNotification()
+                showNotification(true)
+
                 // show notification
-                new Notification('Time out, now look away!', {
-                    requireInteraction: true
-                })
+                new Notification('Time out, now look away!')
             }, MINS * 60 * 1000)
 
             // the countdown timer
@@ -112,12 +137,17 @@
                 if (!mStart) return
 
                 let now = new Date().getTime()
-                let nowMin = Math.max(Math.floor(((now - mStartTime) / 1000) / 60), 1)
+                let nowMin = Math.max(Math.ceil(((now - mStartTime) / 1000) / 60), 1)
                 let nowSecond = Math.floor(((now - mStartTime) / 1000) % 60)
 
                 // calculate seconds delta first
                 mCdSec = 60 - nowSecond
                 mCdMin = MINS - nowMin
+
+                // TODO: if seconds is 0, min should + 1
+                if (mCdSec == 0) {
+                    mCdMin += 1
+                }
 
                 if (mCdSec == 60) {
                     mCdSec = 0;
@@ -167,6 +197,20 @@
                 btnStart.disabled = false
                 btnStop.disabled = true
             }
+        }
+
+        function setLastActivityNotification() {
+            let notification = document.getElementById('notification-time')
+            let now = new Date()
+
+            let hour = now.getHours() > 12 ? now.getHours() - 12 : now.getHours()
+            let ampm = now.getHours() > 12 ? 'pm' : 'am'
+            notification.innerText = `${hour}:${("0" + now.getMinutes()).slice(-2)}${ampm}`
+        }
+
+        function showNotification(show) {
+            let notification = document.getElementById('notification')
+            notification.style.visibility = show ? 'visible' : 'hidden'
         }
 
     </script>
